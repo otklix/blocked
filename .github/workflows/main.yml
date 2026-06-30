@@ -2,36 +2,31 @@ name: Generate iOS Files
 
 on:
   push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   generate:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Создаём папки iOS
+      - name: Создаём папки
         run: |
           mkdir -p System/usr/lib
           mkdir -p System/usr/bin
-          mkdir -p System/Library/Frameworks
-          mkdir -p System/Applications
           echo "✅ Папки созданы"
 
-      - name: Генерируем 10 000 файлов
+      - name: Создаём 1000 файлов
         run: |
-          for i in $(seq 1 10000); do
+          for i in $(seq 1 1000); do
             echo "iOS Library $i" > "System/usr/lib/lib_$i.dylib"
           done
-          echo "✅ 10 000 файлов создано"
+          echo "✅ 1000 файлов создано"
 
-      - name: Сохраняем в репозиторий
+      - name: Сохраняем
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add System/
-          git commit -m "Добавлены файлы iOS" || echo "Нет изменений"
-          git push || echo "Push выполнен"
+          git commit -m "Добавлены файлы" || echo "Нет изменений"
+          git push || echo "Готово"
