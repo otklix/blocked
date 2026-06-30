@@ -7,34 +7,19 @@ import json
 import asyncio
 import tempfile
 import zipfile
-import subprocess
 from urllib.parse import quote
 
 import requests
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command
-from aiogram.types import Message, BufferedInputFile, WebAppInfo, InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.fsm.storage.memory import MemoryStorage
 from aiohttp import web
 import yt_dlp
 from mutagen.id3 import ID3, TIT2, TPE1
 
 # ========== КОНФИГ ==========
-BOT_TOKEN = os.getenv('BOT_TOKEN', 'ВАШ_BOT_TOKEN')
+BOT_TOKEN = os.getenv('BOT_TOKEN', '')
 WEBAPP_HOST = "0.0.0.0"
 WEBAPP_PORT = 8080
-WEBAPP_URL = os.getenv('WEBAPP_URL', f'http://localhost:{WEBAPP_PORT}')
 
-# ========== СОСТОЯНИЯ ==========
-class PlaylistStates(StatesGroup):
-    waiting_for_playlist = State()
-
-# ========== ИНИЦИАЛИЗАЦИЯ ==========
-storage = MemoryStorage()
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher(storage=storage)
+# ========== ХРАНИЛИЩЕ ==========
 user_data = {}
 
 # ========== ФУНКЦИИ ПАРСИНГА ==========
@@ -154,54 +139,25 @@ def download_from_youtube(query: str, output_path: str) -> str:
         
         return mp3_file
 
-def download_track(track: dict, temp_dir: str, custom_name: str = None, custom_artist: str = None) -> str:
+def download_track(track: dict, temp_dir: str) -> str:
     """Скачивает трек с VK или YouTube"""
     search_query = f"{track['artist']} {track['title']}"
-    
-    if custom_name and custom_artist:
-        file_name = f"{custom_name}.mp3"
-    elif custom_name:
-        file_name = f"{custom_name}.mp3"
-    elif custom_artist:
-        file_name = f"{custom_artist} - {track['title']}.mp3"
-    else:
-        file_name = f"{track['artist']} - {track['title']}.mp3"
-    
+    file_name = f"{track['artist']} - {track['title']}.mp3"
     file_name = re.sub(r'[<>:"/\\|?*]', '_', file_name)
     file_path = os.path.join(temp_dir, file_name)
     
-    # Пробуем VK
     vk_url = search_vk_music(search_query)
     if vk_url:
         try:
             download_from_vk(vk_url, file_path)
-            rename_audio_tags(file_path, custom_name or track['title'], custom_artist or track['artist'])
             return file_path
         except:
             pass
     
-    # Пробуем YouTube
     downloaded = download_from_youtube(search_query, file_path)
-    rename_audio_tags(downloaded, custom_name or track['title'], custom_artist or track['artist'])
     return downloaded
 
-def rename_audio_tags(file_path: str, new_title: str, new_artist: str):
-    """Переименовывает теги MP3 файла"""
-    try:
-        if not file_path.lower().endswith('.mp3'):
-            mp3_path = file_path.rsplit('.', 1)[0] + '.mp3'
-            if os.path.exists(mp3_path):
-                file_path = mp3_path
-        
-        if os.path.exists(file_path) and file_path.lower().endswith('.mp3'):
-            audio = ID3(file_path)
-            audio.add(TIT2(encoding=3, text=new_title))
-            audio.add(TPE1(encoding=3, text=new_artist))
-            audio.save()
-    except:
-        pass
-
-# ========== WEB APP СЕРВЕР ==========
+# ========== HTTP API ==========
 
 async def webapp_handler(request):
     """Отдаёт HTML страницу мини-приложения"""
@@ -239,52 +195,48 @@ async def webapp_api(request):
                     'error': str(e)
                 })
         
-        elif action == 'download_tracks':
+        elif action == 'search_track':
+            query = data.get('query', '')
+            try:
+                vk_url = search_vk_music(query)
+                if vk_url:
+                    return web.json_response({
+                        'success': True,
+                        'url': vk_url
+                    })
+                else:
+                    return web.json_response({
+                        'success': False,
+                        'error': 'Трек не найден'
+                    })
+            except Exception as e:
+                return web.json_response({
+                    'success': False,
+                    'error': str(e)
+                })
+        
+        elif action == 'download_track':
             if user_id not in user_data:
                 return web.json_response({
                     'success': False,
                     'error': 'Плейлист не найден'
                 })
             
-            tracks = user_data[user_id]['tracks']
-            custom_name = data.get('custom_name')
-            custom_artist = data.get('custom_artist')
+            index = data.get('index', 0)
+            track = user_data[user_id]['tracks'][index]
             
             with tempfile.TemporaryDirectory() as temp_dir:
-                downloaded_files = []
-                
-                for idx, track in enumerate(tracks, 1):
-                    try:
-                        file_path = download_track(track, temp_dir, custom_name, custom_artist)
-                        downloaded_files.append(file_path)
-                    except Exception as e:
-                        continue
-                
-                if downloaded_files:
-                    zip_path = os.path.join(temp_dir, "playlist.zip")
-                    with zipfile.ZipFile(zip_path, 'w') as zipf:
-                        for file in downloaded_files:
-                            zipf.write(file, os.path.basename(file))
-                    
-                    with open(zip_path, 'rb') as f:
-                        await bot.send_document(
-                            int(user_id),
-                            BufferedInputFile(
-                                f.read(), 
-                                filename=f"playlist_{user_data[user_id]['playlist']['title']}.zip"
-                            ),
-                            caption=f"✅ Скачано {len(downloaded_files)} из {len(tracks)} треков"
-                        )
-                    
+                try:
+                    file_path = download_track(track, temp_dir)
                     return web.json_response({
                         'success': True,
-                        'downloaded': len(downloaded_files),
-                        'total': len(tracks)
+                        'track': track,
+                        'message': f'Скачан: {track["artist"]} - {track["title"]}'
                     })
-                else:
+                except Exception as e:
                     return web.json_response({
                         'success': False,
-                        'error': 'Не удалось скачать ни один трек'
+                        'error': str(e)
                     })
         
         return web.json_response({'success': False, 'error': 'Неизвестное действие'})
@@ -295,53 +247,14 @@ async def webapp_api(request):
             'error': str(e)
         })
 
-# ========== КОМАНДЫ БОТА ==========
-
-@dp.message(Command("start"))
-async def cmd_start(message: Message, state: FSMContext):
-    await state.clear()
-    
-    # Определяем URL для WebApp
-    webapp_url = "https://" + os.getenv('GITHUB_REPOSITORY', 'your-username').split('/')[0] + ".github.io/" + os.getenv('GITHUB_REPOSITORY', 'your-repo').split('/')[1] if os.getenv('GITHUB_REPOSITORY') else "https://your-username.github.io/your-repo"
-    
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(
-                text="🚀 Открыть Music Downloader",
-                web_app=WebAppInfo(url=webapp_url)
-            )],
-            [InlineKeyboardButton(
-                text="❓ Помощь",
-                callback_data="help"
-            )]
-        ]
-    )
-    
-    await message.answer(
-        "🎵 <b>Music Downloader Bot</b>\n\n"
-        "Я помогу скачать плейлисты с Яндекс Музыки.\n"
-        "Нажми на кнопку ниже, чтобы открыть мини-приложение!",
-        parse_mode="HTML",
-        reply_markup=keyboard
-    )
-
-@dp.callback_query(F.data == "help")
-async def help_callback(callback: types.CallbackQuery):
-    await callback.answer()
-    await callback.message.answer(
-        "📖 <b>Инструкция:</b>\n\n"
-        "1️⃣ Нажми 'Открыть Music Downloader'\n"
-        "2️⃣ Вставь ссылку на плейлист Яндекс Музыки\n"
-        "3️⃣ Нажми 'Получить треки'\n"
-        "4️⃣ Настрой переименование (опционально)\n"
-        "5️⃣ Нажми 'Скачать все'\n\n"
-        "✅ Бот пришлёт архив с треками в этот чат!",
-        parse_mode="HTML"
-    )
-
 # ========== ЗАПУСК ==========
 
 async def main():
+    if not BOT_TOKEN:
+        print("❌ Ошибка: BOT_TOKEN не найден!")
+        print("Добавь секрет BOT_TOKEN в настройках GitHub")
+        return
+    
     # Создаём папки
     os.makedirs('downloads', exist_ok=True)
     
@@ -349,16 +262,21 @@ async def main():
     app = web.Application()
     app.router.add_get('/', webapp_handler)
     app.router.add_post('/api', webapp_api)
+    app.router.add_options('/api', lambda req: web.Response())
     
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, host=WEBAPP_HOST, port=WEBAPP_PORT)
     await site.start()
     
-    print(f"🚀 WebApp запущен на порту {WEBAPP_PORT}")
-    print(f"🤖 Бот запущен!")
+    print(f"🚀 Сервер запущен на порту {WEBAPP_PORT}")
+    print("=" * 50)
+    print("⚠️  GitHub Actions не может принимать внешние запросы!")
+    print("📌 Используй Ngrok или Railway для публичного доступа")
+    print("=" * 50)
     
-    await dp.start_polling(bot)
+    # Бесконечный цикл
+    await asyncio.Event().wait()
 
 if __name__ == "__main__":
     asyncio.run(main())
