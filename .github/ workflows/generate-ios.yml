@@ -1,70 +1,31 @@
-name: Generate iOS 18.7 Full System
+name: Generate iOS Files
 
 on:
   workflow_dispatch:
 
 jobs:
-  generate:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Удаляем старые системные файлы
-        run: |
-          rm -rf System/
-          echo "✅ Старые файлы удалены"
-
-      - name: Создаём структуру папок
+      
+      - name: Create folders
         run: |
           mkdir -p System/usr/lib
-          mkdir -p System/usr/bin
           mkdir -p System/Library/Frameworks
-          mkdir -p System/Library/PrivateFrameworks
-          mkdir -p System/Library/Preferences
-          mkdir -p System/Library/LaunchDaemons
-          mkdir -p System/Applications
-          mkdir -p System/dev
-          mkdir -p System/etc
-          mkdir -p System/var
-          mkdir -p System/tmp
-          echo "✅ Папки созданы"
-
-      - name: Генерируем 50 000 библиотек
+          echo "Folders created"
+      
+      - name: Create 1000 files
         run: |
-          for i in $(seq 1 50000); do
-            echo "iOS 18.7 Library #$i" > "System/usr/lib/lib_$i.dylib"
+          for i in $(seq 1 1000); do
+            echo "File $i" > "System/usr/lib/lib_$i.dylib"
           done
-          echo "✅ 50 000 библиотек создано"
-
-      - name: Генерируем 30 000 команд
-        run: |
-          for i in $(seq 1 30000); do
-            echo "#!/bin/bash" > "System/usr/bin/cmd_$i"
-            echo "echo 'Command $i executed'" >> "System/usr/bin/cmd_$i"
-            chmod +x "System/usr/bin/cmd_$i"
-          done
-          echo "✅ 30 000 команд создано"
-
-      - name: Генерируем 15 000 фреймворков
-        run: |
-          for i in $(seq 1 15000); do
-            mkdir -p "System/Library/Frameworks/FW_$i.framework"
-            echo "<plist><dict><key>ID</key><string>$i</string></dict></plist>" > "System/Library/Frameworks/FW_$i.framework/Info.plist"
-          done
-          echo "✅ 15 000 фреймворков создано"
-
-      - name: Генерируем 10 000 приватных фреймворков
-        run: |
-          for i in $(seq 1 10000); do
-            mkdir -p "System/Library/PrivateFrameworks/PF_$i.framework"
-            echo "<plist><dict><key>ID</key><string>$i</string></dict></plist>" > "System/Library/PrivateFrameworks/PF_$i.framework/Info.plist"
-          done
-          echo "✅ 10 000 приватных фреймворков создано"
-
-      - name: Сохраняем в репозиторий
+          echo "1000 files created"
+      
+      - name: Commit
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add System/
-          git commit -m "feat: 105 000+ файлов iOS 18.7" || echo "Нет изменений"
-          git push
+          git commit -m "Add system files" || echo "No changes"
+          git push || echo "Push failed"
