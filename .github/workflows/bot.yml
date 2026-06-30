@@ -23,12 +23,11 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install aiogram==3.3.0
-        pip install requests==2.31.0
+        pip install aiohttp==3.9.0
         pip install yt-dlp==2023.11.16
         pip install mutagen==1.47.0
+        pip install requests==2.31.0
         pip install beautifulsoup4==4.12.2
-        pip install aiohttp==3.9.0
     
     - name: Run bot
       env:
