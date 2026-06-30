@@ -1,0 +1,36 @@
+name: Telegram Music Bot
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Запуск каждые 5 минут
+  workflow_dispatch:        # Ручной запуск
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install FFmpeg
+      run: sudo apt-get update && sudo apt-get install -y ffmpeg
+    
+    - name: Install dependencies
+      run: |
+        pip install aiogram==3.3.0
+        pip install requests==2.31.0
+        pip install yt-dlp==2023.11.16
+        pip install mutagen==1.47.0
+        pip install beautifulsoup4==4.12.2
+        pip install aiohttp==3.9.0
+    
+    - name: Run bot
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      run: python bot.py
