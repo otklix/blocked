@@ -61,22 +61,10 @@ jobs:
           done
           echo "✅ 10 000 приватных фреймворков создано"
 
-      - name: Создаём отчёт
-        run: |
-          echo "# iOS 18.7 - Сгенерировано 105 000+ файлов" > FILE_COUNT.md
-          echo "" >> FILE_COUNT.md
-          echo "| Тип | Количество |" >> FILE_COUNT.md
-          echo "|-----|------------|" >> FILE_COUNT.md
-          echo "| Библиотеки | 50 000 |" >> FILE_COUNT.md
-          echo "| Команды | 30 000 |" >> FILE_COUNT.md
-          echo "| Фреймворки | 15 000 |" >> FILE_COUNT.md
-          echo "| Приватные фреймворки | 10 000 |" >> FILE_COUNT.md
-          echo "| **ИТОГО** | **105 000** |" >> FILE_COUNT.md
-
       - name: Сохраняем в репозиторий
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add System/ FILE_COUNT.md
+          git add System/
           git commit -m "feat: 105 000+ файлов iOS 18.7" || echo "Нет изменений"
           git push
