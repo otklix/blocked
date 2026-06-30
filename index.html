@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS File Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 24px;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .header .logo {
+            font-size: 32px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #58a6ff, #f0883e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .badge {
+            background: #21262d;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #8b949e;
+            margin-left: auto;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #58a6ff;
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.05);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-desc {
+            color: #8b949e;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== INPUTS ===== */
+        .input-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 10px 16px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #c9d1d9;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+            min-width: 120px;
+        }
+
+        .input-group input:focus {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+        }
+
+        .input-group input::placeholder {
+            color: #484f58;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #238636;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #2ea043;
+        }
+
+        .btn-secondary {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+        }
+
+        .btn-secondary:hover {
+            background: #30363d;
+            border-color: #8b949e;
+        }
+
+        .btn-danger {
+            background: #da3633;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #f85149;
+        }
+
+        .btn-purple {
+            background: #8957e5;
+            color: #fff;
+        }
+
+        .btn-purple:hover {
+            background: #a371f7;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== PROGRESS ===== */
+        .progress-container {
+            margin: 16px 0;
+            display: none;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #21262d;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #238636, #58a6ff);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 13px;
+            color: #8b949e;
+        }
+
+        /* ===== OUTPUT ===== */
+        .output {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #c9d1d9;
+            display: none;
+            border: 1px solid #21262d;
+        }
+
+        .output.active {
+            display: block;
+        }
+
+        .output .success {
+            color: #3fb950;
+        }
+
+        .output .error {
+            color: #f85149;
+        }
+
+        .output .info {
+            color: #58a6ff;
+        }
+
+        /* ===== STATS ===== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #21262d;
+        }
+
+        .stat .number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #58a6ff;
+        }
+
+        .stat .label {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+
+        /* ===== REPO INFO ===== */
+        .repo-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #0d1117;
+            border-radius: 8px;
+            border: 1px solid #21262d;
+            font-size: 13px;
+            color: #8b949e;
+        }
+
+        .repo-info .repo-name {
+            color: #58a6ff;
+            font-weight: 600;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 16px 24px;
+            color: #c9d1d9;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .toast .toast-desc {
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .container {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group input {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .toast {
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <span class="logo">📱</span>
+            <h1>iOS File Generator</h1>
+            <span class="badge">v1.0</span>
+        </div>
+
+        <!-- ===== REPO INFO ===== -->
+        <div class="repo-info">
+            <span>📂</span>
+            <span>Репозиторий: <span class="repo-name" id="repoName">otklix/blocked</span></span>
+            <span style="margin-left: auto;">🔒 <span id="fileCount">0</span> файлов</span>
+        </div>
+
+        <!-- ===== MAIN CARD ===== -->
+        <div class="card">
+            <div class="card-title">
+                <span>⚡</span>
+                Генерация файлов
+            </div>
+            <div class="card-desc">
+                Создайте файлы прямо в репозитории через GitHub API.
+            </div>
+
+            <div class="input-group">
+                <input type="number" id="fileCountInput" value="1000" min="1" max="10000" placeholder="Количество">
+                <input type="text" id="folderPath" value="System/usr/lib" placeholder="Путь к папке">
+                <input type="text" id="filePrefix" value="lib_" placeholder="Префикс файла">
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="generateFiles()" id="generateBtn">
+                    🚀 Создать файлы
+                </button>
+                <button class="btn btn-secondary" onclick="clearOutput()">
+                    🗑️ Очистить
+                </button>
+                <button class="btn btn-purple" onclick="showHelp()">
+                    ❓ Помощь
+                </button>
+            </div>
+
+            <!-- ===== PROGRESS ===== -->
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressLabel">Создание файлов...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
+
+            <!-- ===== OUTPUT ===== -->
+            <div class="output" id="output"></div>
+        </div>
+
+        <!-- ===== STATS ===== -->
+        <div class="card">
+            <div class="card-title">
+                <span>📊</span>
+                Статистика
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="number" id="statFiles">0</div>
+                    <div class="label">Создано файлов</div>
+                </div>
+                <div class="stat">
+                    <div class="number" id="statSize">0 MB</div>
+                    <div class="label">Общий размер</div>
+                </div>
+                <div class="stat">
+                    <div class="number" id="statTime">0s</div>
+                    <div class="label">Время генерации</div>
+                </div>
+                <div class="stat">
+                    <div class="number" id="statSpeed">0</div>
+                    <div class="label">Файлов/сек</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== QUICK ACTIONS ===== -->
+        <div class="card">
+            <div class="card-title">
+                <span>🔧</span>
+                Быстрые действия
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="generateFilesWithPreset(10, 'System/usr/lib', 'lib_')">
+                    📦 10 файлов
+                </button>
+                <button class="btn btn-primary" onclick="generateFilesWithPreset(100, 'System/usr/lib', 'lib_')">
+                    📦 100 файлов
+                </button>
+                <button class="btn btn-primary" onclick="generateFilesWithPreset(1000, 'System/usr/lib', 'lib_')">
+                    📦 1000 файлов
+                </button>
+                <button class="btn btn-primary" onclick="generateFilesWithPreset(5000, 'System/usr/lib', 'lib_')">
+                    📦 5000 файлов
+                </button>
+                <button class="btn btn-danger" onclick="deleteAllFiles()">
+                    🗑️ Удалить все
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== HELP ===== -->
+        <div class="card" id="helpCard" style="display: none;">
+            <div class="card-title">
+                <span>❓</span>
+                Как это работает
+            </div>
+            <div style="color: #8b949e; font-size: 14px; line-height: 1.8;">
+                <p>1. Файлы создаются в папке <code style="background:#0d1117;padding:2px 8px;border-radius:4px;">System/usr/lib</code></p>
+                <p>2. Каждый файл имеет содержимое с номером и версией</p>
+                <p>3. После создания файлы можно скачать или сохранить в репозиторий</p>
+                <p>4. Используйте кнопки быстрых действий для генерации</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast">
+        <div class="toast-title" id="toastTitle">✅ Готово!</div>
+        <div class="toast-desc" id="toastDesc">Файлы успешно созданы</div>
+    </div>
+
+    <script>
+        // ============================================================
+        // ГЛАВНАЯ ЛОГИКА
+        // ============================================================
+
+        let totalFiles = 0;
+        let totalSize = 0;
+        let startTime = 0;
+
+        // ---------- ГЕНЕРАЦИЯ ФАЙЛОВ ----------
+        async function generateFiles() {
+            const count = parseInt(document.getElementById('fileCountInput').value) || 1000;
+            const folder = document.getElementById('folderPath').value || 'System/usr/lib';
+            const prefix = document.getElementById('filePrefix').value || 'lib_';
+
+            if (count < 1 || count > 10000) {
+                showToast('⚠️ Ошибка', 'Количество должно быть от 1 до 10000');
+                return;
+            }
+
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Создание...';
+
+            showProgress(true);
+            updateProgress(0, `Создание ${count} файлов...`);
+
+            const output = document.getElementById('output');
+            output.classList.add('active');
+            output.innerHTML = `<span class="info">⏳ Начинаем генерацию ${count} файлов...</span>\n`;
+
+            startTime = Date.now();
+            let created = 0;
+            let errors = 0;
+            totalSize = 0;
+
+            // Создаём файлы пакетами по 50
+            const batchSize = 50;
+            const batches = Math.ceil(count / batchSize);
+
+            for (let b = 0; b < batches; b++) {
+                const start = b * batchSize + 1;
+                const end = Math.min((b + 1) * batchSize, count);
+
+                for (let i = start; i <= end; i++) {
+                    const filename = `${prefix}${i}.dylib`;
+                    const content = `iOS Library ${i}\nVersion: 1.0.${i}\nArchitecture: arm64\nGenerated: ${new Date().toISOString()}`;
+
+                    try {
+                        // Создаём файл через API
+                        await createFile(folder, filename, content);
+                        created++;
+                        totalSize += content.length;
+                    } catch (e) {
+                        errors++;
+                        output.innerHTML += `<span class="error">❌ Ошибка: ${filename}</span>\n`;
+                    }
+
+                    // Обновляем прогресс
+                    const progress = Math.round((created / count) * 100);
+                    updateProgress(progress, `Создано ${created}/${count} файлов`);
+                }
+
+                // Небольшая пауза между пакетами
+                await sleep(50);
+            }
+
+            const elapsed = (Date.now() - startTime) / 1000;
+            totalFiles += created;
+
+            // Статистика
+            document.getElementById('statFiles').textContent = totalFiles;
+            document.getElementById('statSize').textContent = (totalSize / 1024 / 1024).toFixed(2) + ' MB';
+            document.getElementById('statTime').textContent = elapsed.toFixed(1) + 's';
+            document.getElementById('statSpeed').textContent = Math.round(created / elapsed);
+
+            document.getElementById('fileCount').textContent = totalFiles;
+
+            // Результат
+            output.innerHTML += `\n<span class="success">✅ Создано ${created} файлов (ошибок: ${errors})</span>`;
+            output.innerHTML += `\n<span class="info">⏱️ Время: ${elapsed.toFixed(1)} сек</span>`;
+            output.scrollTop = output.scrollHeight;
+
+            showProgress(false);
+            btn.disabled = false;
+            btn.textContent = '🚀 Создать файлы';
+
+            showToast('✅ Готово!', `Создано ${created} файлов за ${elapsed.toFixed(1)} сек`);
+
+            // Сохраняем в репозиторий
+            await saveToRepository();
+        }
+
+        // ---------- СОЗДАНИЕ ФАЙЛА ЧЕРЕЗ API ----------
+        async function createFile(folder, filename, content) {
+            const path = `${folder}/${filename}`;
+            const encodedContent = btoa(unescape(encodeURIComponent(content)));
+
+            const response = await fetch(`/api/repos/otklix/blocked/contents/${path}`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: `Добавлен файл ${filename}`,
+                    content: encodedContent,
+                    branch: 'main'
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Ошибка создания файла');
+            }
+
+            return response.json();
+        }
+
+        // ---------- СОХРАНЕНИЕ В РЕПОЗИТОРИЙ ----------
+        async function saveToRepository() {
+            // Здесь можно добавить логику коммита
+            console.log('💾 Файлы сохранены в репозиторий');
+        }
+
+        // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
+        function updateProgress(percent, label) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('progressLabel').textContent = label;
+        }
+
+        function showProgress(show) {
+            document.getElementById('progressContainer').classList.toggle('active', show);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function showToast(title, desc) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastDesc').textContent = desc;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        function clearOutput() {
+            document.getElementById('output').classList.remove('active');
+            document.getElementById('output').innerHTML = '';
+        }
+
+        function showHelp() {
+            const card = document.getElementById('helpCard');
+            card.style.display = card.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function generateFilesWithPreset(count, folder, prefix) {
+            document.getElementById('fileCountInput').value = count;
+            document.getElementById('folderPath').value = folder;
+            document.getElementById('filePrefix').value = prefix;
+            generateFiles();
+        }
+
+        async function deleteAllFiles() {
+            if (!confirm('Удалить все файлы в System/usr/lib/?')) return;
+
+            showToast('⏳ Удаление...', 'Удаляем файлы');
+
+            try {
+                // Получаем список файлов
+                const response = await fetch('/api/repos/otklix/blocked/contents/System/usr/lib', {
+                    headers: { 'Accept': 'application/vnd.github.v3+json' }
+                });
+
+                if (response.ok) {
+                    const files = await response.json();
+                    for (const file of files) {
+                        await fetch(`/api/repos/otklix/blocked/contents/${file.path}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                message: `Удалён файл ${file.name}`,
+                                sha: file.sha,
+                                branch: 'main'
+                            })
+                        });
+                    }
+                    showToast('✅ Готово!', `Удалено ${files.length} файлов`);
+                    totalFiles = 0;
+                    document.getElementById('fileCount').textContent = '0';
+                    document.getElementById('statFiles').textContent = '0';
+                }
+            } catch (e) {
+                showToast('❌ Ошибка', 'Не удалось удалить файлы');
+            }
+        }
+
+        // ---------- ИНИЦИАЛИЗАЦИЯ ----------
+        document.addEventListener('DOMContentLoaded', () => {
+            // Получаем имя репозитория
+            const repoName = document.getElementById('repoName');
+            // Можно добавить динамическое определение
+
+            console.log('📱 iOS File Generator загружен');
+            console.log('💡 Используйте кнопки для генерации файлов');
+        });
+    </script>
+</body>
+</html>
