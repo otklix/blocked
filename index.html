@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,17 +19,14 @@
             align-items: center;
             padding: 20px;
         }
-
         .container {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255,255,255,0.95);
             border-radius: 20px;
             padding: 30px;
             max-width: 500px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-
         h1 {
             font-size: 24px;
             color: #333;
@@ -39,17 +35,14 @@
             align-items: center;
             gap: 10px;
         }
-
         .subtitle {
             color: #666;
             font-size: 14px;
             margin-bottom: 25px;
         }
-
         .input-group {
             margin-bottom: 15px;
         }
-
         label {
             display: block;
             font-size: 14px;
@@ -57,7 +50,6 @@
             color: #555;
             margin-bottom: 5px;
         }
-
         input[type="text"], input[type="url"] {
             width: 100%;
             padding: 12px 16px;
@@ -67,14 +59,12 @@
             transition: all 0.3s ease;
             background: #f8f9fa;
         }
-
         input:focus {
             outline: none;
             border-color: #667eea;
             background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
         }
-
         .btn {
             width: 100%;
             padding: 14px;
@@ -89,61 +79,44 @@
             justify-content: center;
             gap: 8px;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
         }
-
         .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-
         .btn-success {
             background: #10b981;
             color: white;
         }
-
         .btn-success:hover {
             background: #059669;
             transform: translateY(-2px);
         }
-
         .btn-danger {
             background: #ef4444;
             color: white;
         }
-
         .btn-danger:hover {
             background: #dc2626;
         }
-
         .btn-secondary {
             background: #e5e7eb;
             color: #333;
         }
-
         .btn-secondary:hover {
             background: #d1d5db;
         }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 13px;
-            width: auto;
-        }
-
         .hidden {
             display: none !important;
         }
-
         #playlistInfo {
             margin-top: 20px;
             padding: 16px;
@@ -151,25 +124,21 @@
             border-radius: 12px;
             border-left: 4px solid #667eea;
         }
-
         #playlistInfo h3 {
             font-size: 16px;
             color: #333;
             margin-bottom: 8px;
         }
-
         #playlistInfo p {
             font-size: 14px;
             color: #666;
             margin-bottom: 4px;
         }
-
         #tracksList {
             margin-top: 15px;
             max-height: 200px;
             overflow-y: auto;
         }
-
         .track-item {
             padding: 8px 12px;
             background: white;
@@ -181,22 +150,18 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .track-item .index {
             color: #999;
             font-weight: 600;
             margin-right: 10px;
         }
-
         .track-item .artist {
             color: #667eea;
             font-weight: 500;
         }
-
         .progress-container {
             margin-top: 20px;
         }
-
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -205,42 +170,28 @@
             overflow: hidden;
             margin-top: 5px;
         }
-
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea, #764ba2);
             transition: width 0.3s ease;
             width: 0%;
         }
-
         .status-text {
             font-size: 14px;
             color: #666;
             text-align: center;
             margin-top: 10px;
         }
-
         .settings-group {
             margin-top: 15px;
             padding-top: 15px;
             border-top: 2px dashed #e5e7eb;
         }
-
         .settings-group h4 {
             font-size: 14px;
             color: #555;
             margin-bottom: 10px;
         }
-
-        .flex-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .flex-row .input-group {
-            flex: 1;
-        }
-
         .badge {
             display: inline-block;
             padding: 2px 10px;
@@ -248,17 +199,14 @@
             font-size: 12px;
             font-weight: 600;
         }
-
         .badge-success {
             background: #d1fae5;
             color: #065f46;
         }
-
         .badge-warning {
             background: #fef3c7;
             color: #92400e;
         }
-
         .error-message {
             color: #ef4444;
             font-size: 14px;
@@ -267,7 +215,6 @@
             background: #fee2e2;
             border-radius: 8px;
         }
-
         .success-message {
             color: #10b981;
             font-size: 14px;
@@ -276,38 +223,32 @@
             background: #d1fae5;
             border-radius: 8px;
         }
-
         .btn-group {
             display: flex;
             gap: 10px;
             margin-top: 10px;
         }
-
         .btn-group .btn {
             flex: 1;
         }
-
         .loader {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 0.6s linear infinite;
         }
-
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
         .footer {
             margin-top: 20px;
             text-align: center;
             font-size: 12px;
             color: #999;
         }
-
         .footer a {
             color: #667eea;
             text-decoration: none;
@@ -315,7 +256,6 @@
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>
             🎵 Music Downloader
@@ -323,7 +263,6 @@
         </h1>
         <p class="subtitle">Скачивай плейлисты с Яндекс Музыки</p>
 
-        <!-- Шаг 1: Ввод ссылки -->
         <div id="step1">
             <div class="input-group">
                 <label>🔗 Ссылка на плейлист Яндекс Музыки</label>
@@ -334,7 +273,6 @@
             </button>
         </div>
 
-        <!-- Шаг 2: Информация о плейлисте -->
         <div id="step2" class="hidden">
             <div id="playlistInfo">
                 <h3 id="playlistTitle">Название плейлиста</h3>
@@ -345,11 +283,11 @@
             <div class="settings-group">
                 <h4>⚙️ Настройки переименования</h4>
                 <div class="input-group">
-                    <label>Название (оставь пустым для оригинала)</label>
+                    <label>Новое название (оставь пустым для оригинала)</label>
                     <input type="text" id="customName" placeholder="Например: Легенда">
                 </div>
                 <div class="input-group">
-                    <label>Исполнитель (оставь пустым для оригинала)</label>
+                    <label>Новый исполнитель (оставь пустым для оригинала)</label>
                     <input type="text" id="customArtist" placeholder="Например: Новый исполнитель">
                 </div>
             </div>
@@ -364,7 +302,6 @@
             </div>
         </div>
 
-        <!-- Шаг 3: Прогресс -->
         <div id="step3" class="hidden">
             <div class="progress-container">
                 <div class="progress-bar">
@@ -377,7 +314,6 @@
             </button>
         </div>
 
-        <!-- Сообщения -->
         <div id="messageContainer"></div>
 
         <div class="footer">
@@ -386,7 +322,6 @@
     </div>
 
     <script>
-        // Получаем данные пользователя из Telegram
         let tg = window.Telegram?.WebApp;
         let userData = {
             userId: null,
@@ -394,29 +329,21 @@
             tracks: []
         };
 
-        // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             if (tg) {
                 tg.ready();
                 tg.expand();
                 userData.userId = tg.initDataUnsafe?.user?.id || 'anonymous';
-                console.log('Telegram WebApp инициализирован');
             } else {
-                console.log('Работает в браузере (режим разработки)');
                 userData.userId = 'test_user_' + Date.now();
             }
         });
 
-        // Функция закрытия приложения
         function closeApp() {
-            if (tg) {
-                tg.close();
-            } else {
-                alert('Закрыть приложение можно только в Telegram');
-            }
+            if (tg) tg.close();
+            else alert('Закрыть можно только в Telegram');
         }
 
-        // Парсинг плейлиста
         async function parsePlaylist() {
             const urlInput = document.getElementById('playlistUrl');
             const url = urlInput.value.trim();
@@ -461,14 +388,12 @@
                 }
             } catch (error) {
                 showMessage('Ошибка подключения к серверу', 'error');
-                console.error(error);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '📥 Получить треки';
             }
         }
 
-        // Отображение информации о плейлисте
         function showPlaylistInfo(playlist) {
             document.getElementById('playlistTitle').textContent = '📀 ' + playlist.title;
             document.getElementById('trackCount').textContent = playlist.count;
@@ -499,7 +424,6 @@
             }
         }
 
-        // Скачивание треков
         async function downloadTracks() {
             const customName = document.getElementById('customName').value.trim();
             const customArtist = document.getElementById('customArtist').value.trim();
@@ -509,7 +433,6 @@
                 return;
             }
 
-            // Переход на шаг прогресса
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step3').classList.remove('hidden');
             updateBadge('warning', 'Загрузка...');
@@ -541,24 +464,20 @@
             } catch (error) {
                 updateProgress(0, '❌ Ошибка подключения');
                 showMessage('Ошибка подключения к серверу', 'error');
-                console.error(error);
             }
         }
 
-        // Обновление прогресса
         function updateProgress(percent, text) {
             document.getElementById('progressFill').style.width = percent + '%';
             document.getElementById('statusText').textContent = text;
         }
 
-        // Обновление статуса
         function updateBadge(type, text) {
             const badge = document.getElementById('statusBadge');
             badge.className = 'badge badge-' + type;
             badge.textContent = text;
         }
 
-        // Показ сообщений
         function showMessage(text, type) {
             const container = document.getElementById('messageContainer');
             const div = document.createElement('div');
@@ -568,13 +487,10 @@
             container.appendChild(div);
             
             setTimeout(() => {
-                if (div.parentNode) {
-                    div.remove();
-                }
+                if (div.parentNode) div.remove();
             }, 5000);
         }
 
-        // Сброс состояния
         function resetAll() {
             document.getElementById('step1').classList.remove('hidden');
             document.getElementById('step2').classList.add('hidden');
@@ -589,17 +505,11 @@
             userData.playlist = null;
         }
 
-        // Поддержка Enter
         document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const active = document.activeElement;
-                if (active && active.id === 'playlistUrl') {
-                    parsePlaylist();
-                }
+            if (e.key === 'Enter' && document.activeElement?.id === 'playlistUrl') {
+                parsePlaylist();
             }
         });
-
-        console.log('Mini App готов к работе!');
     </script>
 </body>
 </html>
