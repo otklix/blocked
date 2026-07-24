@@ -1,35 +1,66 @@
-name: Telegram Music Bot
+name: Обработка геолокации
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'  # Запуск каждые 5 минут
-  workflow_dispatch:        # Ручной запуск
+  issues:
+    types: [opened]
 
 jobs:
-  run-bot:
+  send_location:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-    
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install FFmpeg
-      run: sudo apt-get update && sudo apt-get install -y ffmpeg
-    
-    - name: Install dependencies
-      run: |
-        pip install aiohttp==3.9.0
-        pip install yt-dlp==2023.11.16
-        pip install mutagen==1.47.0
-        pip install requests==2.31.0
-        pip install beautifulsoup4==4.12.2
-    
-    - name: Run bot
-      env:
-        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      run: python bot.py
+      - name: Извлечь данные из Issue
+        id: extract
+        run: |
+          BODY="${{ github.event.issue.body }}"
+          CODE=$(echo "$BODY" | grep -oP 'Код: \K[a-f0-9]+')
+          LAT=$(echo "$BODY" | grep -oP 'Координаты: \K[0-9.]+')
+          LON=$(echo "$BODY" | grep -oP ',\s*\K[0-9.]+')
+          ADDRESS=$(echo "$BODY" | grep -oP 'Адрес: \K.+')
+          
+          echo "code=$CODE" >> $GITHUB_OUTPUT
+          echo "lat=$LAT" >> $GITHUB_OUTPUT
+          echo "lon=$LON" >> $GITHUB_OUTPUT
+          echo "address=$ADDRESS" >> $GITHUB_OUTPUT
+
+      - name: Получить links.json
+        run: |
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/contents/links.json \
+            | jq -r '.content' | base64 -d > links.json || echo "{}" > links.json
+
+      - name: Найти chat_id по коду
+        id: get_chat
+        run: |
+          CODE="${{ steps.extract.outputs.code }}"
+          CHAT_ID=$(jq -r ".\"$CODE\"" links.json)
+          echo "chat_id=$CHAT_ID" >> $GITHUB_OUTPUT
+
+      - name: Отправить карту в Telegram
+        if: steps.get_chat.outputs.chat_id != 'null'
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: |
+          CHAT_ID="${{ steps.get_chat.outputs.chat_id }}"
+          LAT="${{ steps.extract.outputs.lat }}"
+          LON="${{ steps.extract.outputs.lon }}"
+          ADDRESS="${{ steps.extract.outputs.address }}"
+          
+          # Отправляем Location (карта Telegram)
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendLocation" \
+            -d chat_id="$CHAT_ID" \
+            -d latitude="$LAT" \
+            -d longitude="$LON"
+          
+          # Отправляем текст с адресом
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d chat_id="$CHAT_ID" \
+            -d text="📍 Человек находится здесь:\n\n$ADDRESS\n\n🗺️ https://www.google.com/maps?q=$LAT,$LON"
+
+      - name: Закрыть Issue (опционально)
+        if: steps.get_chat.outputs.chat_id != 'null'
+        run: |
+          curl -s -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"state":"closed"}' \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}"
